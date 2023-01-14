@@ -69,3 +69,5 @@ margin_bottom = 17.0
 theme = SubResource( 3 )
 tab_size = 1
 text = "XT-002 Deconstructor"
+
+[node name="DebuffCooldown" type="Timer" parent="."]
