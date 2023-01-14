@@ -8,6 +8,4 @@ public class Enemy_HurtBox : HurtBox
 		this.SetCollisionMaskBit(3, true);
 		this.SetCollisionLayer(0);
 	}
-	
-	
 }

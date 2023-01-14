@@ -10,12 +10,12 @@
 [sub_resource type="CircleShape2D" id=1]
 radius = 127.004
 
-[sub_resource type="DynamicFont" id=2]
+[sub_resource type="DynamicFont" id=4]
 size = 20
 font_data = ExtResource( 6 )
 
 [sub_resource type="Theme" id=3]
-default_font = SubResource( 2 )
+default_font = SubResource( 4 )
 
 [node name="XT" type="KinematicBody2D"]
 collision_layer = 0
