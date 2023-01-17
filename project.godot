@@ -21,6 +21,7 @@ _global_script_class_icons={
 [application]
 
 config/name="Raid Practicer"
+run/main_scene="res://Scenes/Ulduar/MainScene.tscn"
 config/icon="res://icon.png"
 
 [editor]

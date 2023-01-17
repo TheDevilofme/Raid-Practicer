@@ -754,8 +754,10 @@ animation = "IdleSide"
 [node name="Player_HitBox" type="Area2D" parent="AnimatedSprite"]
 position = Vector2( 0, -0.251351 )
 scale = Vector2( 1, 1.005 )
+collision_layer = 0
+collision_mask = 0
 script = ExtResource( 3 )
-Damage = 100
+Damage = 10
 
 [node name="HitBox_CollisionShape" type="CollisionShape2D" parent="AnimatedSprite/Player_HitBox"]
 position = Vector2( 37.5, 11.5 )
@@ -780,9 +782,11 @@ anims/WalkUp = SubResource( 41 )
 position = Vector2( 0.5, 16 )
 shape = SubResource( 33 )
 
-[node name="Hurtbox" type="Area2D" parent="."]
+[node name="Player_HurtBox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 0
 script = ExtResource( 4 )
 
-[node name="Player_HurtBox" type="CollisionShape2D" parent="Hurtbox"]
+[node name="Player_HurtBox" type="CollisionShape2D" parent="Player_HurtBox"]
 position = Vector2( 0.5, 16 )
 shape = SubResource( 33 )

@@ -7,13 +7,13 @@ public class HurtBox : Area2D
 		this.Connect("area_entered", this, nameof(OnAreaEntered));
 	}
 	
-	public void OnAreaEntered(Player_HitBox playerHitBox) {
-		if(playerHitBox == null) {
+	public void OnAreaEntered(HitBox hitBox) {
+		if(hitBox == null) {
 			return;
 		}
 		if(Owner is IDamagable) {
 		IDamagable damagable = (IDamagable)Owner;
-			damagable.TakeDamage(playerHitBox.Damage);
+			damagable.TakeDamage(hitBox.Damage);
 		}
 		
 	}

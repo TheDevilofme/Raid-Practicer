@@ -1,16 +1,16 @@
-[gd_scene load_steps=13 format=2]
+[gd_scene load_steps=16 format=2]
 
 [ext_resource path="res://Sprites/Maps/Bosses/XTBackground.png" type="Texture" id=1]
 [ext_resource path="res://Scenes/General/player.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Scenes/Ulduar/XT-Boss/XT.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Scripts/Ulduar/XT/XTMain.cs" type="Script" id=4]
+[ext_resource path="res://Scenes/General/HUD.tscn" type="PackedScene" id=5]
+[ext_resource path="res://Scripts/Ulduar/XT/LightDebuffPosition.cs" type="Script" id=6]
+[ext_resource path="res://Scripts/Ulduar/XT/DarkDebuffPosition.cs" type="Script" id=7]
 
 [sub_resource type="CapsuleShape2D" id=7]
 radius = 40.0
 height = 108.0
-
-[sub_resource type="RectangleShape2D" id=8]
-extents = Vector2( 217, 374 )
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 52, 316 )
@@ -30,6 +30,9 @@ extents = Vector2( 38.75, 126 )
 [sub_resource type="RectangleShape2D" id=6]
 extents = Vector2( 38.5, 127 )
 
+[sub_resource type="RectangleShape2D" id=8]
+extents = Vector2( 264, 483.5 )
+
 [node name="XT-BossRoom" type="Node2D"]
 script = ExtResource( 4 )
 
@@ -38,26 +41,24 @@ position = Vector2( 511, 119 )
 scale = Vector2( 0.5, 0.5 )
 
 [node name="StandardPosition" type="Area2D" parent="XT"]
+collision_layer = 0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="XT/StandardPosition"]
-position = Vector2( -140, 60 )
+position = Vector2( -140, 64 )
 rotation = 1.5708
 shape = SubResource( 7 )
 
 [node name="LightDebuffPosition" type="Area2D" parent="XT"]
+collision_layer = 0
+script = ExtResource( 6 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="XT/LightDebuffPosition"]
 position = Vector2( 136, 60 )
 rotation = 1.5708
 shape = SubResource( 7 )
 
-[node name="DarkDebuffPosition" type="Area2D" parent="XT"]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="XT/DarkDebuffPosition"]
-position = Vector2( -465, 136 )
-shape = SubResource( 8 )
-
 [node name="Walls" type="StaticBody2D" parent="."]
+collision_layer = 0
 
 [node name="LeftWall" type="CollisionShape2D" parent="Walls"]
 position = Vector2( 41, 303 )
@@ -89,17 +90,42 @@ scale = Vector2( 0.4, 0.4 )
 moving_platform_apply_velocity_on_leave = 2
 Speed = 100
 
+[node name="DarkDebuffPosition" type="Area2D" parent="."]
+position = Vector2( 511, 119 )
+scale = Vector2( 0.5, 0.5 )
+collision_layer = 0
+script = ExtResource( 7 )
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DarkDebuffPosition"]
+position = Vector2( -564, 247.5 )
+shape = SubResource( 8 )
+
+[node name="ExitedStandardPosition" type="Timer" parent="."]
+wait_time = 5.0
+
+[node name="HUD" parent="." instance=ExtResource( 5 )]
+layer = 2
+
 [node name="BackgroundLayer" type="CanvasLayer" parent="."]
 layer = -1
-visible = false
 follow_viewport_enable = true
 
 [node name="Background" type="Sprite" parent="BackgroundLayer"]
-position = Vector2( 512.5, 299 )
+position = Vector2( 512, 300 )
 scale = Vector2( 1.38391, 1.46009 )
 texture = ExtResource( 1 )
 
-[node name="LeftStandardPosition" type="Timer" parent="."]
-wait_time = 5.0
-
+[connection signal="BossKilled" from="XT" to="." method="OnBossKilled"]
+[connection signal="CastedDebuff" from="XT" to="." method="OnCastDebuff"]
 [connection signal="PhaseSwitch" from="XT" to="." method="OnXTPhaseSwitch"]
+[connection signal="body_entered" from="XT/StandardPosition" to="." method="OnEnteredStandardPosition"]
+[connection signal="body_exited" from="XT/StandardPosition" to="." method="OnExitedStandardPosition"]
+[connection signal="body_entered" from="XT/LightDebuffPosition" to="XT/LightDebuffPosition" method="OnLightDebuffPositionBodyEntered"]
+[connection signal="body_exited" from="XT/LightDebuffPosition" to="XT/LightDebuffPosition" method="OnLightDebuffPositionBodyExited"]
+[connection signal="AddedDebuff" from="Player" to="HUD" method="AddDebuff"]
+[connection signal="GameOver" from="Player" to="." method="OnGameOver"]
+[connection signal="HealthChanged" from="Player" to="HUD" method="UpdateHealthBar"]
+[connection signal="RemovedDebuff" from="Player" to="HUD" method="RemoveDebuff"]
+[connection signal="body_entered" from="DarkDebuffPosition" to="DarkDebuffPosition" method="OnDarkDebuffPositionBodyEntered"]
+[connection signal="body_exited" from="DarkDebuffPosition" to="DarkDebuffPosition" method="OnDarkDebuffPositionBodyExited"]
+[connection signal="timeout" from="ExitedStandardPosition" to="." method="OnExitedStandardPositionTimerExpiration"]

@@ -1,0 +1,45 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://Sprites/General/HealthBarSystem/HB_Frames_0212_Package-----------------.png" type="Texture" id=1]
+[ext_resource path="res://Sprites/General/HealthBarSystem/HPBars1_0050_Package-----------------.png" type="Texture" id=2]
+[ext_resource path="res://Sprites/General/dodge_assets/fonts/Xolonium-Regular.ttf" type="DynamicFontData" id=3]
+[ext_resource path="res://Scripts/General/UI/HealthBar.cs" type="Script" id=4]
+
+[sub_resource type="DynamicFont" id=4]
+size = 20
+font_data = ExtResource( 3 )
+
+[sub_resource type="Theme" id=5]
+default_font = SubResource( 4 )
+
+[node name="HealthBar" type="Control"]
+margin_right = 247.0
+margin_bottom = 43.0
+script = ExtResource( 4 )
+
+[node name="HealthBarBackground" type="TextureProgress" parent="."]
+value = 50.0
+texture_under = ExtResource( 1 )
+texture_progress_offset = Vector2( 6, 6 )
+tint_under = Color( 0, 0, 0, 1 )
+
+[node name="HealthBarUnder" type="TextureProgress" parent="."]
+value = 75.0
+texture_progress = ExtResource( 2 )
+texture_progress_offset = Vector2( 6, 6 )
+tint_progress = Color( 1, 0, 0, 1 )
+
+[node name="HealthBarOver" type="TextureProgress" parent="."]
+value = 50.0
+texture_progress = ExtResource( 2 )
+texture_progress_offset = Vector2( 6, 6 )
+
+[node name="UpdateTween" type="Tween" parent="."]
+
+[node name="LabelAboveHealthBar" type="RichTextLabel" parent="."]
+margin_top = -23.0
+margin_right = 240.0
+margin_bottom = 17.0
+theme = SubResource( 5 )
+tab_size = 1
+text = "Player"

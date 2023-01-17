@@ -1,7 +1,8 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
-public class Player : KinematicBody2D, IDamagable
+public class Player : KinematicBody2D, IDamagable, IBuffable
 {
 	private AnimatedSprite _AnimatedSprite;
 	private FacingDirection _FacingDirection = FacingDirection.Down;
@@ -10,6 +11,8 @@ public class Player : KinematicBody2D, IDamagable
 	private float _FacingAngle = 0;
 	private float _AttackCooldown = 0;
 	
+	public List<IDebuff> DebuffList {get;}
+	public UnitStateMachine UnitStateMachine {get; private set;}
 	public Vector2 ScreenSize;
 	
 	[Export]
@@ -21,13 +24,15 @@ public class Player : KinematicBody2D, IDamagable
 	public float AttackSpeed = 1;
 	
 	[Signal]
+	public delegate void GameOver();
+	[Signal]
 	public delegate void Attack();
-	
-	
-	
-	// Declare member variables here. Examples:
-	// private int a = 2;
-	// private string b = "text";
+	[Signal]
+	public delegate void AddedDebuff(AbstractDebuff debuff);
+	[Signal]
+	public delegate void HealthChanged(int healthValue);
+	[Signal]
+	public delegate void RemovedDebuff(AbstractDebuff debuff);
 	
 	public void Start(Vector2 pos) {
 		Position = pos;
@@ -35,8 +40,14 @@ public class Player : KinematicBody2D, IDamagable
 		GetNode<CollisionShape2D>("HitBox_CollisionShape").Disabled = false;
 	}
 	
+	public Player() {
+		DebuffList = new List<IDebuff>();
+		
+	}
+
 	public override void _Ready()
 	{
+		UnitStateMachine = new UnitStateMachine();
 		this.Connect(nameof(Attack), this, nameof(OnAttack));
 		ScreenSize = GetViewportRect().Size;
 		_AnimationPlayer = GetNode<AnimationPlayer>("AnimatedSprite/AnimationPlayer");
@@ -51,6 +62,7 @@ public class Player : KinematicBody2D, IDamagable
 	Animate();
 	Move(velocity, delta);
 	AttackCheck(delta);
+	ProcessDebuffs(delta);
   }
 
 private Vector2 CalculateVelocity() {
@@ -153,8 +165,10 @@ private bool IsCurrentlyDoingAnAction() {
 
 public void TakeDamage(int damage) {
 	Hitpoints -= damage;
+	EmitSignal(nameof(HealthChanged), Hitpoints);
 	if(Hitpoints <= 0) {
-		
+		QueueFree();
+		EmitSignal(nameof(GameOver));
 	}
 }
 
@@ -183,5 +197,28 @@ private void OnAttack(AttackType attackType, FacingDirection facingDirection, Ve
 			break;
 	}
 	}
+}
+
+private void ProcessDebuffs(float delta) {
+	List<IDebuff> debuffsToRemove = new List<IDebuff>();
+	foreach (var debuff in DebuffList)
+	{
+		debuff.ProcessTime(delta, this);
+		if (debuff.IsExpired())
+		{
+			debuff.Expire(this);
+			debuffsToRemove.Add(debuff);
+			EmitSignal(nameof(RemovedDebuff), debuff);
+		}
+	}
+	foreach (var debuff in debuffsToRemove)
+	{
+		DebuffList.Remove(debuff);
+	}
+}
+
+public void AddDebuff(IDebuff debuff) {
+	DebuffList.Add(debuff);
+	EmitSignal(nameof(AddedDebuff), debuff);
 }
 }
